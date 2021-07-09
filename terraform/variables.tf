@@ -35,29 +35,46 @@ variable "vpc_instance_tenancy" {
   default     = "default"
 }
 
-variable "aws_az1" {
-  description = "The AZ where public-subnet1 will reside"
+variable "vpc_az1" {
+  description = "The AZ where *-subnet1 will reside"
   type        = string
 }
 
-variable "public_subnet1_cidr" {
+variable "vpc_az2" {
+  description = "The AZ where *-subnet2 will reside"
+  type        = string
+}
+
+variable "vpc_public_subnet1_cidr" {
   description = "The cidr block to use for public-subnet1"
   type        = string
 }
 
-variable "public_subnet2_cidr" {
+variable "vpc_public_subnet2_cidr" {
   description = "The cidr block to use for public-subnet2"
   type        = string
 }
 
-variable "private_subnet1_cidr" {
+variable "vpc_private_subnet1_cidr" {
   description = "The cidr block to use for private-subnet1"
   type        = string
 }
 
-variable "private_subnet2_cidr" {
+variable "vpc_private_subnet2_cidr" {
   description = "The cidr block to use for private-subnet2"
   type        = string
+}
+
+variable "db_engine" {
+  description = "The underlying database engine to use"
+  type        = string
+  default     = "postgres"
+}
+
+variable "db_instance_class" {
+  description = "The instance type to use for the database instances"
+  type        = string
+  default     = "db.t2.micro"
 }
 
 variable "db_multi_az" {
@@ -70,6 +87,12 @@ variable "db_skip_final_snapshot" {
   description = "Should we skip snapshot creation just before deleting the DB?"
   type        = bool
   default     = false
+}
+
+variable "db_storage_size_in_gb" {
+  description = "Size of the database in GB"
+  type        = number
+  default     = 20
 }
 
 variable "k8s_desired_size" {

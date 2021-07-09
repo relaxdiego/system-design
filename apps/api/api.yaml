@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: system-design
+  name: system-design-api
+  labels:
+    app: system-design
+    component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: system-design
+      component: api
+  template:
+    metadata:
+      labels:
+        app: system-design
+        component: api
+    spec:
+      containers:
+      - name: api
+        image: REGISTRY_URL:IMAGE_VERSION
+        ports:
+        - containerPort: 80
+        env:
+        - name: POSTGRES_URL
+          value: DB_ENDPOINT
+        - name: POSTGRES_DB
+          value: DB_NAME
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: db_user
+        - name: POSTGRES_PASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: db_pass
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: system-design
+  name: system-design-api
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  type: NodePort
+  selector:
+    app: system-design
+    component: api
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: system-design
+  name: system-design-api
+  annotations:
+    # Empty until we create the certificate in ACM as per README
+    alb.ingress.kubernetes.io/certificate-arn: ""
+    alb.ingress.kubernetes.io/group.name: "CLUSTER_NAME"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/target-type: ip
+    cert-manager.io/cluster-issuer: CLUSTER_NAME
+    kubernetes.io/ingress.class: alb
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+    - hosts:
+        - api.ROUTE53_ZONE_FQDN
+      secretName: system-design-api-tls
+  rules:
+    - host: api.ROUTE53_ZONE_FQDN
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: system-design-api
+                port:
+                  number: 80

@@ -1,0 +1,23 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: CLUSTER_NAME
+spec:
+  acme:
+    # STAGING SERVER
+    # Use this for testing
+    server: 'https://acme-staging-v02.api.letsencrypt.org/directory'
+    # PROD SERVER
+    # Use this after you've confirmed that it all works
+    # server: 'https://acme-v02.api.letsencrypt.org/directory'
+    privateKeySecretRef:
+      name: CLUSTER_NAME-issuer-pkey
+    solvers:
+    - selector:
+        dnsZones:
+          - "ROUTE53_ZONE_FQDN"
+      dns01:
+        route53:
+          region: AWS_REGION
+          hostedZoneID: ROUTE53_ZONE_ID
+          role: CERT_MANAGER_ROLE_ARN

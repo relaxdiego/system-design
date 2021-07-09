@@ -14,7 +14,7 @@ locals {
 
 
 resource "aws_db_subnet_group" "db" {
-  name = var.env_name
+  name = var.cluster_name
   subnet_ids = [
     aws_subnet.private_subnet1.id,
     aws_subnet.private_subnet2.id
@@ -24,6 +24,27 @@ resource "aws_db_subnet_group" "db" {
     Name = "${var.cluster_name}"
   }
 }
+
+
+resource "aws_security_group" "database" {
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    description = "Incoming access"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [
+      var.vpc_private_subnet1_cidr,
+      var.vpc_private_subnet2_cidr
+    ]
+  }
+
+  tags = {
+    Name = "${var.cluster_name}-database"
+  }
+}
+
 
 resource "aws_db_instance" "db" {
   identifier           = var.cluster_name
@@ -37,7 +58,7 @@ resource "aws_db_instance" "db" {
   multi_az             = var.db_multi_az
   skip_final_snapshot  = var.db_skip_final_snapshot
   vpc_security_group_ids = [
-    aws_security_group.allow_db_access_within_vpc.id
+    aws_security_group.database.id
   ]
 
   depends_on = [aws_db_subnet_group.db]

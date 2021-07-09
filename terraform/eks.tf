@@ -79,6 +79,58 @@ resource "aws_iam_role_policy_attachment" "ecr_read_only" {
   role       = aws_iam_role.k8s_node_group.name
 }
 
+resource "aws_security_group" "workers" {
+  vpc_id = aws_vpc.main.id
+
+  # Based on https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html
+
+  ingress {
+    description = "Inbound traffic from other workers"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+    self        = true
+  }
+
+  ingress {
+    description = "Inbound HTTPS traffic"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "All other inbound traffic"
+    from_port   = 1025
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Additional worker rules
+
+  ingress {
+    description     = "SSH from bastion"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
+  }
+
+  tags = {
+    Name = "${var.cluster_name}-workers"
+  }
+}
+
 resource "aws_launch_template" "k8s" {
   name     = var.cluster_name
   key_name = var.ec2_key_name

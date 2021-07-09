@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: system-design
+  name: whale-ui
+  labels:
+    app: whale
+    component: ui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: whale
+      component: ui
+  template:
+    metadata:
+      labels:
+        app: whale
+        component: ui
+    spec:
+      containers:
+      - name: ui
+        image: REGISTRY_URL:IMAGE_VERSION
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: system-design
+  name: whale-ui
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  type: NodePort
+  selector:
+    app: whale
+    component: ui
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: system-design
+  name: system-design-ui
+  annotations:
+    # Empty until we create the certificate in ACM as per README
+    alb.ingress.kubernetes.io/certificate-arn: ""
+    alb.ingress.kubernetes.io/group.name: "CLUSTER_NAME"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/target-type: ip
+    cert-manager.io/cluster-issuer: CLUSTER_NAME
+    kubernetes.io/ingress.class: alb
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+    - hosts:
+        - ui.ROUTE53_ZONE_FQDN
+      secretName: system-design-ui-tls
+  rules:
+    - host: ui.ROUTE53_ZONE_FQDN
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whale-ui
+                port:
+                  number: 80

@@ -1,0 +1,28 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Whale, Hello There!</title>
+</head>
+<body>
+  <h1>Whale, Hello There!</h1>
+  <img src="hello-there.jpg" alt="obi-wan"/>
+  <div>
+    <input type="text" id="conversationID" value="1234">
+    <button type="button" onclick="loadMessages()">Load Messages</button>
+  </div>
+
+  <div id="demo">
+  </div>
+
+  <script>
+  function loadMessages() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.onload = function() {
+      document.getElementById("demo").innerHTML = this.responseText;
+    }
+    xhttp.open("GET", "https://api.bartfast.relaxdiego.com/conversations/" + document.getElementById('conversationID').value);
+    xhttp.send();
+  }
+</script>
+</body>
+</html>

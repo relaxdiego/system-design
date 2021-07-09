@@ -1,9 +1,9 @@
-output "account_id" {
-  value = data.aws_caller_identity.current.account_id
-}
-
 output "cluster_name" {
   value = var.cluster_name
+}
+
+output "aws_account_id" {
+  value = data.aws_caller_identity.current.account_id
 }
 
 output "aws_profile" {
@@ -15,12 +15,12 @@ output "aws_region" {
 }
 
 output "bastion_instance_id" {
-  value       = aws_instance.bastion1.id
+  value       = aws_instance.bastion.id
   description = "Use this with github.com/relaxdiego/ssh4realz to ssh to the bastion for the first time"
 }
 
 output "bastion_public_ip" {
-  value = aws_instance.bastion1.public_ip
+  value = aws_instance.bastion.public_ip
 }
 
 output "db_endpoint" {
