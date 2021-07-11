@@ -3,6 +3,7 @@
 ## Video Walkthroughs
 
 1. [Part 1](https://youtu.be/8-M2rK4NRyI)
+2. [Part 2](https://youtu.be/RuCOqveUM9k)
 
 
 ## Prerequisites
