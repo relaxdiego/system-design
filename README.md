@@ -1,5 +1,12 @@
 # System Design: 3-Tier Web App on AWS EKS
 
+This is a companion repo for the series of videos I created below. Please
+note that this codebase is for educational purposes only and is NOT guaranteed
+to be the best implementation for production purposes. For more technical
+discussions on Kubernetes, CI/CD, and software engineering in general, please
+visit [relaxdiego.com](https://relaxdiego.com).
+
+
 ## Video Walkthroughs
 
 1. [Part 1](https://youtu.be/8-M2rK4NRyI)
