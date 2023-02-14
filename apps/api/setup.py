@@ -6,7 +6,7 @@ requirements = [
     'fastapi==0.65.2',
     'psycopg2',
     'pydantic==1.8.2',
-    'starlette==0.14.2',
+    'starlette==0.25.0',
     'uvicorn==0.13.4',
 ]
 
